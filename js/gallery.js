@@ -64,40 +64,36 @@ const images = [
   },
 ];
 
-const galleryContainer = document.querySelector('.gallery');
+const gallery = document.querySelector('.gallery');
 
-images.forEach(image => {
-  const listItem = document.createElement('li');
-  listItem.classList.add('gallery-item');
+const galleryItems = images
+  .map(
+    ({ preview, original, description }) =>
+      `
+    <li class="gallery-item">
+      <a class="gallery-link" href="${original}">
+        <img
+          class="gallery-image"
+          src="${preview}"
+          data-source="${original}"
+          alt="${description}"
+        />
+      </a>
+    </li>
+  `
+  )
+  .join('');
 
-  const link = document.createElement('a');
-  link.classList.add('gallery-link');
-  link.href = image.original;
+gallery.insertAdjacentHTML('beforeend', galleryItems);
 
-  const img = document.createElement('img');
-  img.classList.add('gallery-image');
-  img.src = image.preview;
-  img.dataset.source = image.original;
-  img.alt = image.description;
-
-  link.appendChild(img);
-  listItem.appendChild(link);
-  galleryContainer.appendChild(listItem);
-});
-
-galleryContainer.addEventListener('click', event => {
+gallery.addEventListener('click', event => {
   event.preventDefault();
 
-  if (event.target.nodeName !== 'IMG') {
+  if (event.currentTarget === event.target) {
     return;
   }
 
   const largeImageUrl = event.target.dataset.source;
 
-  openModal(largeImageUrl);
+  basicLightbox.create(`<img src="${largeImageUrl}">`).show();
 });
-
-function openModal(imageUrl) {
-  const instance = basicLightbox.create(`<img src="${imageUrl}">`);
-  instance.show();
-}
